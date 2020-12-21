@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>TalkToTheList</title> 
+
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" /> 
+
+
+    
+  </head>
+  <body> 
+    <!--jQuery-->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+    <!--Popper needed for some Bootstrap components -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script> 
+
+    <!--Bootstrap--> 
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <!--Angular-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular-route.min.js" integrity="sha256-jZRUyy674QanjfVAn9YBW+d1iuxj8csDOxrwS35/GLo=" crossorigin="anonymous"></script>
+    
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">
+        <img src="./images/list.png" width="30" height="30" alt=""> 
+        TalkToTheList
+      </a> 
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#!/">Home</a>
+          </li> 
+    
+          <li class="nav-item">
+            <a class="nav-link" href="#!/lists">Lists</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#!/login">Login</a>
+          </li> 
+           <li class="nav-item">
+            <a class="nav-link" href="#!/register">Register</a>
+          </li>
+        </ul>
+      </div>   
+    </nav> 
+
+    <div ng-view></div> 
+
+    <footer class="footer bg-light">
+      <div class="container"align="center" >
+        <span class="text-muted" >Copyright &copy; 2020 Alex Lu</span>
+      </div>
+    </footer> 
+
+    <script>
+      var myApp=angular.module("myApp",["ngRoute"]);
+      myApp.config(function($routeProvider){
+        $routeProvider
+          .when("/",{
+            templateUrl:"views/home.html",
+            controller:"homeController"
+          }) 
+          .when("/login",{
+            templateUrl:"views/login.html", 
+            controller:"loginController"
+          })
+          .when("/lists",{
+            templateUrl:"views/lists.html",
+            controller:"listController"
+          })
+          
+          .when("/register",{
+            templateUrl:"views/register.html", 
+            controller: "registerController"
+          }) 
+
+          .when("/sampleuser",{
+            templateUrl:"views/sampleuser.html", 
+            controller:"sampleUserController"
+          })
+      });  
+
+
+      myApp.controller("homeController",function($scope,$http){ 
+        $scope.addSuggestion=function(){
+          let newSuggestion={
+            title:$scope.titleText,
+            category:$scope.categoryText
+          }
+          $http.post("/api/user/Alex",newSuggestion).then(function(result){
+            $scope.suggestionlist=result.data.suggestionslist;
+            $scope.watchList=result.data.watchingList;
+            $scope.titleText=$scope.categoryText="";
+          })
+        }
+
+        $scope.loadSample=function(){
+          $http.get("/api/user/Alex").then(function(result){
+            $scope.suggestionlist=result.data.suggestionslist; 
+            $scope.watchList=result.data.watchingList; 
+          })
+        }
+      });
+      myApp.controller("listController",function($scope,$http){ 
+
+
+        $scope.search=function(){
+          $http.get("/api/user/"+$scope.nameText).then(function(result){
+            $scope.searchStatus="";
+            $scope.username=result.data.username;
+            $scope.suggestionlist=result.data.suggestionslist; 
+            $scope.watchList=result.data.watchingList; 
+            $scope.loadUser=true;
+
+          }).catch(function(err){
+            $scope.searchStatus=err.data; 
+            $scope.loadUser=false;
+          })
+          
+        } 
+  
+        $scope.addSuggestion=function(){
+          let newSuggestion={
+            title:$scope.titleText,
+            category:$scope.categoryText
+          }
+          $http.post("/api/user/"+$scope.username,newSuggestion).then(function(result){
+            $scope.suggestionlist=result.data.suggestionslist;
+            $scope.watchList=result.data.watchingList; 
+            $scope.titleText=$scope.categoryText="";
+          })
+        }
+
+      });
+
+      myApp.controller("loginController",function($scope,$http,$rootScope){
+        $scope.login=function(){
+
+          let loginInfo={
+            username:$scope.usernameText,
+            password:$scope.passwordText
+          }
+          $http.post("/api/user/login",loginInfo).then(function(result){
+            localStorage.setItem("jwt",result.data.jwt);
+            $rootScope.username=$scope.usernameText;
+            $scope.usernameText=$scope.passwordText="";
+            window.location="#!/sampleuser";
+
+          }).catch(function(err){
+             $scope.logStatus=err.data;
+          })
+
+          
+        }
+      });
+
+      myApp.controller("sampleUserController",function($scope,$http,$rootScope){
+        $scope.logout=function(){ 
+          localStorage.removeItem("jwt");
+          window.location="#!/";
+        } 
+        $scope.loadlists=function(){
+          $http.get("/api/user/"+$rootScope.username).then(function(result){
+            $scope.suggestionlist=result.data.suggestionslist;
+            $scope.watchlist=result.data.watchingList;
+            $scope.username=result.data.username;
+          }).catch(function(){
+            window.location="#!/login";
+          })
+        } 
+
+        $scope.deleteElement=function(titleText,categoryText){ 
+          let deleteObj={
+            title:titleText,
+            category:categoryText
+          } 
+
+          $http.put("/api/user/profile/suggestionslist/"+$scope.username,deleteObj,{headers:{"x-authtoken":localStorage.getItem("jwt")}}).then(function(result){
+            $scope.suggestionlist=result.data.suggestionslist;
+            $scope.watchList=result.data.watchingList;
+            $scope.loadlists();
+          })
+
+        } 
+        $scope.addWatching=function(titleText,categoryText){
+          let addObj={
+            title:titleText,
+            category:categoryText
+          } 
+          $http.post("/api/user/profile/watchlist/"+$scope.username,addObj,{headers:{"x-authtoken":localStorage.getItem("jwt")}}).then(function(result){
+            $scope.suggestionlist=result.data.suggestionslist;
+            $scope.watchList=result.data.watchingList;
+            $scope.loadlists();
+          })
+        }
+
+        $scope.removeWatching=function(titleText,categoryText){
+          let deleteObj={
+            title:titleText,
+            category:categoryText
+          } 
+           $http.put("/api/user/profile/watchlist/"+$scope.username,deleteObj,{headers:{"x-authtoken":localStorage.getItem("jwt")}}).then(function(result){
+            $scope.watchList=result.data.watchingList;
+            $scope.loadlists();
+          })
+        }
+
+        $scope.deleteAccount=function(){
+          $http.delete("/api/user/profile/"+$scope.username,{headers:{"x-authtoken":localStorage.getItem("jwt")}}).then(function(){
+            window.location="#!/";
+          })
+        } 
+
+        $scope.editAccount=function(){ 
+
+          let editObj;
+          if($scope.newUsername&&$scope.newPassword){
+            editObj={
+              username:$scope.newUsername,
+              password:$scope.newPassword
+            }
+          }else if($scope.newUsername){
+            editObj={
+              username:$scope.newUsername
+            }
+          }else if($scope.newPassword){
+            editObj={
+              password:$scope.newPassword
+            }
+          } 
+
+          $http.put("/api/user/profile/"+$scope.username,editObj,{headers:{"x-authtoken":localStorage.getItem("jwt")}}).then(function(result){
+            $scope.username=result.data.username;
+            localStorage.setItem("jwt", result.data.jwt);
+            $scope.editStatus=result.data.message;
+
+          }).catch(function(err){
+            $scope.editStatus=err.data
+          })
+        }
+      })
+
+      myApp.controller("registerController",function($scope,$http,$rootScope){
+        $scope.register=function(){
+         let regInfo={
+           username:$scope.usernameText,
+           password:$scope.passwordText
+         }
+
+          $http.post("/api/user/register",regInfo).then(function(result){
+             $rootScope.username=$scope.usernameText;
+             $scope.usernameText=$scope.passwordText=$scope.confirmPass=""; 
+            localStorage.setItem("jwt", result.data.jwt);
+             window.location="#!/sampleuser";
+          }).catch(function(err){
+            $scope.regStatus=err.data;
+          })
+        }
+      })
+
+
+    </script>
+  </body>
+</html>

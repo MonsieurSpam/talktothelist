@@ -1,0 +1,73 @@
+
+<div class="jumbotron">
+  <h1 class="display-4"align="center" >📝 Lists</h1> 
+  <hr width="50%"> 
+  <p class="lead"align="center">Type a user's username in the field below</p>   
+  <form class="form-inline justify-content-center"> 
+      <div class="form-group mb-2">
+        <input type="text" class="form-control col-lg-12" id="titleInput" placeholder="Enter username here" ng-model="nameText">
+      </div> 
+
+      <button type="submit" class="btn btn-primary mx-sm-3 mb-2" ng-click="search()">Search</button> 
+      
+    </form>  
+    <div class="container justify-content-center" align="center" style="width:50%;"> 
+       <div class="alert alert-primary"  role="alert" ng-show="searchStatus">{{searchStatus}}</div>
+    </div>
+   
+
+</div>  
+
+<div class="container" ng-show="loadUser" onload="loadlists();"> 
+    <h2 class="display-5" align="center"> <u>{{username}}'s Watchlist </u></h2> 
+
+    <form class="form-inline justify-content-center"> 
+      <div class="form-group mb-2">
+        <input type="text" class="form-control col-lg-12" id="titleInput" placeholder="Title of Recommendation" ng-model="titleText">
+      </div> 
+      <div class="form-group  mx-sm-3 mb-2"">
+       
+        <select class="form-control" ng-model="categoryText">
+          <option>Movie</option>
+          <option>TV Show</option>
+          <option>Music</option>
+          <option>Game</option>
+        </select>
+      </div> 
+      <button type="submit" class="btn btn-primary mb-2"ng-disabled="!categoryText||!titleText" ng-click="addSuggestion()">Submit</button>
+    </form> 
+    <br>
+
+    <div class="container">
+        <div class="row justify-content-center" align="center"> 
+          
+          <div class="col-lg-5  p-3 mb-3 mb-md-0 mr-md-3 bg-light" style="height:500px;">
+            <h2> <u>Suggestions</u></h2> 
+            <div class="col-lg-12 overflow-auto p-3 mb-3 mb-md-0 mr-md-3 bg-light" style="max-height:400px;">
+              <ul  class="list-group">
+                <li ng-repeat="suggestion in suggestionlist" class="list-group-item">
+                  {{suggestion.title}}
+                </li> 
+               
+                
+              </ul> 
+            </div>
+          </div>
+          <br>
+          
+          <div class="col-lg-5 p-3 mb-3 mb-md-0 mr-md-3 bg-light" style="height:500px;" > 
+            <h2> <u>Watching </u></h2> 
+            <div class="col-lg-12 overflow-auto p-3 mb-3 mb-md-0 mr-md-3 bg-light" style="max-height:400px;">  
+              <ul  class="list-group">
+                <li ng-repeat="item in watchList" class="list-group-item">
+                  {{item.title}}
+                </li> 
+                
+     
+              </ul> 
+            </div>
+          </div>
+      </div>
+      <br>
+    </div>
+</div>
